@@ -2,26 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Ensure proper scaling on mobile devices -->
+  <!-- Proper scaling on mobile devices -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Mobile web app meta tags -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="theme-color" content="#3a7bd5" />
-  <title>Advanced Periodic Table Explorer</title>
+  <title>Responsive Periodic Table Explorer</title>
   <style>
-    /* Reset & Global Styles */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; }
+    /* RESET & GLOBAL STYLES */
+    * {
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+    }
     body {
       font-family: Arial, sans-serif;
       transition: background 0.3s, color 0.3s;
       -webkit-tap-highlight-color: transparent;
     }
-    /* Themes */
+    /* LIGHT & DARK THEMES */
     body.light { background: #f0f0f0; color: #333; }
-    body.dark { background: #121212; color: #ddd; }
-    
+    body.dark  { background: #121212; color: #ddd; }
+
+    /* HEADER */
     header {
       background: linear-gradient(135deg, #3a7bd5, #00d2ff);
       padding: 20px;
@@ -31,25 +34,29 @@
       top: 0;
       z-index: 100;
     }
-    header h1 { font-size: 2em; }
-    header .controls {
-      margin-top: 10px;
+    header h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    .controls {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 10px;
       flex-wrap: wrap;
+      gap: 10px;
     }
-    header input[type="text"],
-    header select {
+    .controls input[type="text"],
+    .controls select {
       padding: 10px;
       border: none;
       border-radius: 4px;
       font-size: 1em;
     }
-    header input[type="text"] { width: 300px; }
-    header select { width: 220px; }
-    header button {
+    .controls input[type="text"] {
+      width: 250px;
+      max-width: 90%;
+    }
+    .controls button {
       padding: 10px 15px;
       border: none;
       border-radius: 4px;
@@ -59,49 +66,89 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-    header button:hover { background: #e68900; }
-    
-    main { padding: 20px; max-width: 1200px; margin: auto; }
-    
-    /* Periodic Table Grid */
+    .controls button:hover {
+      background: #e68900;
+    }
+
+    /* MAIN CONTENT */
+    main {
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+      width: 100%;
+    }
+
+    /* SCROLLABLE TABLE WRAPPER */
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto; /* horizontal scroll on smaller screens */
+      margin-bottom: 20px;
+    }
+
+    /* PERIODIC TABLE GRID */
     #table-container {
-      display: grid;
-      grid-template-columns: repeat(18, 1fr);
+      /* We use inline-grid so it can expand horizontally, and we let the wrapper scroll. */
+      display: inline-grid;
+      /* 18 columns, each at least 80px wide (adjust if you want smaller/larger tiles). */
+      grid-template-columns: repeat(18, minmax(80px, 1fr));
+      grid-auto-rows: minmax(100px, auto);
       gap: 5px;
       position: relative;
+      padding-bottom: 10px;
     }
-    
-    /* Element Tiles */
+
+    /* ELEMENT TILES */
     .element {
       border: 1px solid #ccc;
       border-radius: 5px;
-      padding: 5px;
       text-align: center;
       cursor: pointer;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       transition: transform 0.2s, box-shadow 0.2s;
       position: relative;
       overflow: hidden;
+      background: #fff;
     }
-    .element:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
-    .element-number { font-size: 0.7em; color: #666; }
-    .element-symbol { font-size: 1.5em; font-weight: bold; margin: 5px 0; }
-    .element-name { font-size: 0.8em; color: #333; }
-    body.dark .element-name { color: #bbb; }
-    
-    /* Color Coding by Category */
-    .element.category-alkali { background-color: #ffb3b3; }            /* Light red */
-    .element.category-alkaline-earth { background-color: #ffe5b3; }      /* Light orange */
-    .element.category-transition { background-color: #e6e6e6; }          /* Light grey */
-    .element.category-post-transition { background-color: #d9ead3; }     /* Light green */
-    .element.category-metalloid { background-color: #cfe2f3; }           /* Light blue */
-    .element.category-nonmetal { background-color: #f9cb9c; }            /* Soft peach */
-    .element.category-halogen { background-color: #f4cccc; }             /* Soft red */
-    .element.category-noble-gas { background-color: #c9daf8; }           /* Soft blue */
-    .element.category-lanthanide { background-color: #ead1dc; }          /* Light pink */
-    .element.category-actinide { background-color: #d9d2e9; }            /* Light purple */
-    
-    /* Tooltip (desktop only) */
+    body.dark .element {
+      background: #1e1e1e;
+      border: 1px solid #444;
+    }
+    .element:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .element-number {
+      font-size: 0.7em;
+      color: #666;
+      margin-top: 5px;
+    }
+    .element-symbol {
+      font-size: 1.4em;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+    .element-name {
+      font-size: 0.8em;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    body.dark .element-name {
+      color: #ccc;
+    }
+
+    /* COLOR CODING BY CATEGORY */
+    .element.category-alkali           { background-color: #ffb3b3; }   /* Light red */
+    .element.category-alkaline-earth   { background-color: #ffe5b3; }   /* Light orange */
+    .element.category-transition       { background-color: #e6e6e6; }   /* Light grey */
+    .element.category-post-transition  { background-color: #d9ead3; }   /* Light green */
+    .element.category-metalloid        { background-color: #cfe2f3; }   /* Light blue */
+    .element.category-nonmetal         { background-color: #f9cb9c; }   /* Soft peach */
+    .element.category-halogen          { background-color: #f4cccc; }   /* Soft red */
+    .element.category-noble-gas        { background-color: #c9daf8; }   /* Soft blue */
+    .element.category-lanthanide       { background-color: #ead1dc; }   /* Light pink */
+    .element.category-actinide         { background-color: #d9d2e9; }   /* Light purple */
+
+    /* TOOLTIP (shown on hover for desktop) */
     #tooltip {
       position: absolute;
       background: rgba(0, 0, 0, 0.75);
@@ -114,8 +161,8 @@
       transition: opacity 0.2s;
       z-index: 200;
     }
-    
-    /* Modal Styles */
+
+    /* MODAL STYLES */
     .modal {
       display: none;
       position: fixed;
@@ -130,7 +177,7 @@
     }
     @keyframes fadeIn {
       from { opacity: 0; }
-      to { opacity: 1; }
+      to   { opacity: 1; }
     }
     .modal-content {
       background-color: #fefefe;
@@ -142,11 +189,11 @@
       position: relative;
       animation: slideIn 0.3s;
       transition: transform 0.2s ease-out;
-      touch-action: pan-y;
+      touch-action: pan-y; /* for swipe-down */
     }
     @keyframes slideIn {
       from { transform: translateY(-20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      to   { transform: translateY(0); opacity: 1; }
     }
     .close {
       color: #aaa;
@@ -158,22 +205,24 @@
       cursor: pointer;
       transition: color 0.3s;
     }
-    .close:hover { color: #000; }
-    .detail-item { margin: 10px 0; font-size: 1em; }
-    
-    /* Responsive adjustments for mobile devices */
-    @media (max-width: 600px) {
-      header h1 { font-size: 1.5em; }
-      header input[type="text"] { width: 200px; }
-      header select { width: 180px; }
-      #table-container { gap: 3px; }
-      .element { padding: 3px; font-size: 0.9em; }
+    .close:hover {
+      color: #000;
+    }
+    .detail-item {
+      margin: 10px 0;
+      font-size: 1em;
+    }
+
+    /* A BIT MORE RESPONSIVE TWEAKING */
+    @media (max-width: 768px) {
+      header h1 { font-size: 1.4em; }
+      .controls input[type="text"] { width: 200px; }
     }
   </style>
 </head>
 <body class="light">
   <header>
-    <h1>Advanced Periodic Table Explorer</h1>
+    <h1>Responsive Periodic Table Explorer</h1>
     <div class="controls">
       <input type="text" id="search" placeholder="Search by name, symbol, number" />
       <select id="categoryFilter" aria-label="Filter elements by category">
@@ -193,13 +242,16 @@
     </div>
   </header>
   <main>
-    <div id="table-container"></div>
+    <!-- WRAPPER to enable horizontal scroll on smaller screens -->
+    <div class="table-wrapper">
+      <div id="table-container"></div>
+    </div>
   </main>
   
-  <!-- Tooltip (for desktop hover) -->
+  <!-- TOOLTIP (for desktop hover) -->
   <div id="tooltip"></div>
   
-  <!-- Modal for Element Details -->
+  <!-- MODAL -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -208,12 +260,12 @@
   </div>
   
   <script>
-    // Element data with grid positions
+    // 1) ELEMENT DATA
     const elements = [
-      // Period 1
+      /* Period 1 */
       { number: 1,  symbol: "H",  name: "Hydrogen",      atomicMass: "1.008",    row: 1, col: 1 },
       { number: 2,  symbol: "He", name: "Helium",        atomicMass: "4.0026",   row: 1, col: 18 },
-      // Period 2
+      /* Period 2 */
       { number: 3,  symbol: "Li", name: "Lithium",       atomicMass: "6.94",     row: 2, col: 1 },
       { number: 4,  symbol: "Be", name: "Beryllium",     atomicMass: "9.0122",   row: 2, col: 2 },
       { number: 5,  symbol: "B",  name: "Boron",         atomicMass: "10.81",    row: 2, col: 13 },
@@ -222,7 +274,7 @@
       { number: 8,  symbol: "O",  name: "Oxygen",        atomicMass: "15.999",   row: 2, col: 16 },
       { number: 9,  symbol: "F",  name: "Fluorine",      atomicMass: "18.998",   row: 2, col: 17 },
       { number: 10, symbol: "Ne", name: "Neon",          atomicMass: "20.180",   row: 2, col: 18 },
-      // Period 3
+      /* Period 3 */
       { number: 11, symbol: "Na", name: "Sodium",        atomicMass: "22.990",   row: 3, col: 1 },
       { number: 12, symbol: "Mg", name: "Magnesium",     atomicMass: "24.305",   row: 3, col: 2 },
       { number: 13, symbol: "Al", name: "Aluminium",     atomicMass: "26.982",   row: 3, col: 13 },
@@ -231,7 +283,7 @@
       { number: 16, symbol: "S",  name: "Sulfur",        atomicMass: "32.06",    row: 3, col: 16 },
       { number: 17, symbol: "Cl", name: "Chlorine",      atomicMass: "35.45",    row: 3, col: 17 },
       { number: 18, symbol: "Ar", name: "Argon",         atomicMass: "39.948",   row: 3, col: 18 },
-      // Period 4
+      /* Period 4 */
       { number: 19, symbol: "K",  name: "Potassium",     atomicMass: "39.098",   row: 4, col: 1 },
       { number: 20, symbol: "Ca", name: "Calcium",       atomicMass: "40.078",   row: 4, col: 2 },
       { number: 21, symbol: "Sc", name: "Scandium",      atomicMass: "44.956",   row: 4, col: 3 },
@@ -250,7 +302,7 @@
       { number: 34, symbol: "Se", name: "Selenium",      atomicMass: "78.971",   row: 4, col: 16 },
       { number: 35, symbol: "Br", name: "Bromine",       atomicMass: "79.904",   row: 4, col: 17 },
       { number: 36, symbol: "Kr", name: "Krypton",       atomicMass: "83.798",   row: 4, col: 18 },
-      // Period 5
+      /* Period 5 */
       { number: 37, symbol: "Rb", name: "Rubidium",      atomicMass: "85.468",   row: 5, col: 1 },
       { number: 38, symbol: "Sr", name: "Strontium",     atomicMass: "87.62",    row: 5, col: 2 },
       { number: 39, symbol: "Y",  name: "Yttrium",       atomicMass: "88.906",   row: 5, col: 3 },
@@ -269,10 +321,10 @@
       { number: 52, symbol: "Te", name: "Tellurium",     atomicMass: "127.60",   row: 5, col: 16 },
       { number: 53, symbol: "I",  name: "Iodine",        atomicMass: "126.90",   row: 5, col: 17 },
       { number: 54, symbol: "Xe", name: "Xenon",         atomicMass: "131.29",   row: 5, col: 18 },
-      // Period 6 (Main Table, skipping Lanthanides)
+      /* Period 6 (skip Lanthanides in main row) */
       { number: 55, symbol: "Cs", name: "Cesium",        atomicMass: "132.91",   row: 6, col: 1 },
       { number: 56, symbol: "Ba", name: "Barium",        atomicMass: "137.33",   row: 6, col: 2 },
-      // Main row continues with atomic numbers 72–86
+      /* 72–86 */
       { number: 72, symbol: "Hf", name: "Hafnium",       atomicMass: "178.49",   row: 6, col: 4 },
       { number: 73, symbol: "Ta", name: "Tantalum",      atomicMass: "180.95",   row: 6, col: 5 },
       { number: 74, symbol: "W",  name: "Tungsten",      atomicMass: "183.84",   row: 6, col: 6 },
@@ -288,10 +340,10 @@
       { number: 84, symbol: "Po", name: "Polonium",      atomicMass: "209",      row: 6, col: 16 },
       { number: 85, symbol: "At", name: "Astatine",      atomicMass: "210",      row: 6, col: 17 },
       { number: 86, symbol: "Rn", name: "Radon",         atomicMass: "222",      row: 6, col: 18 },
-      // Period 7 (Main Table, skipping Actinides)
+      /* Period 7 (skip Actinides in main row) */
       { number: 87, symbol: "Fr", name: "Francium",      atomicMass: "223",      row: 7, col: 1 },
       { number: 88, symbol: "Ra", name: "Radium",        atomicMass: "226",      row: 7, col: 2 },
-      // Main row continues with atomic numbers 104–118
+      /* 104–118 */
       { number: 104, symbol: "Rf", name: "Rutherfordium", atomicMass: "267",   row: 7, col: 4 },
       { number: 105, symbol: "Db", name: "Dubnium",       atomicMass: "268",   row: 7, col: 5 },
       { number: 106, symbol: "Sg", name: "Seaborgium",    atomicMass: "271",   row: 7, col: 6 },
@@ -307,7 +359,7 @@
       { number: 116, symbol: "Lv", name: "Livermorium",   atomicMass: "293",   row: 7, col: 16 },
       { number: 117, symbol: "Ts", name: "Tennessine",    atomicMass: "294",   row: 7, col: 17 },
       { number: 118, symbol: "Og", name: "Oganesson",     atomicMass: "294",   row: 7, col: 18 },
-      // Lanthanides (extra row)
+      /* Lanthanides (extra row) */
       { number: 57, symbol: "La", name: "Lanthanum",     atomicMass: "138.91",  row: 8, col: 3 },
       { number: 58, symbol: "Ce", name: "Cerium",        atomicMass: "140.12",  row: 8, col: 4 },
       { number: 59, symbol: "Pr", name: "Praseodymium",  atomicMass: "140.91",  row: 8, col: 5 },
@@ -323,7 +375,7 @@
       { number: 69, symbol: "Tm", name: "Thulium",       atomicMass: "168.93",  row: 8, col: 15 },
       { number: 70, symbol: "Yb", name: "Ytterbium",     atomicMass: "173.05",  row: 8, col: 16 },
       { number: 71, symbol: "Lu", name: "Lutetium",      atomicMass: "174.97",  row: 8, col: 17 },
-      // Actinides (extra row)
+      /* Actinides (extra row) */
       { number: 89, symbol: "Ac", name: "Actinium",      atomicMass: "227",     row: 9, col: 3 },
       { number: 90, symbol: "Th", name: "Thorium",       atomicMass: "232.04",  row: 9, col: 4 },
       { number: 91, symbol: "Pa", name: "Protactinium",  atomicMass: "231.04",  row: 9, col: 5 },
@@ -338,121 +390,120 @@
       { number: 100, symbol: "Fm", name: "Fermium",      atomicMass: "257",     row: 9, col: 14 },
       { number: 101, symbol: "Md", name: "Mendelevium",  atomicMass: "258",     row: 9, col: 15 },
       { number: 102, symbol: "No", name: "Nobelium",     atomicMass: "259",     row: 9, col: 16 },
-      { number: 103, symbol: "Lr", name: "Lawrencium",   atomicMass: "262",     row: 9, col: 17 }
+      { number: 103, symbol: "Lr", name: "Lawrencium",   atomicMass: "262",     row: 9, col: 17 },
     ];
-    
-    // Determine element category based on atomic number
+
+    // 2) DETERMINE CATEGORY (for color coding)
     function getCategory(item) {
       const num = item.number;
       if (num === 1) return "nonmetal";
-      if ([2, 10, 18, 36, 54, 86, 118].includes(num)) return "noble-gas";
-      if ([3, 11, 19, 37, 55, 87].includes(num)) return "alkali";
-      if ([4, 12, 20, 38, 56, 88].includes(num)) return "alkaline-earth";
-      if ([9, 17, 35, 53, 85].includes(num)) return "halogen";
-      if (num >= 57 && num <= 71) return "lanthanide";
+      if ([2,10,18,36,54,86,118].includes(num)) return "noble-gas";
+      if ([3,11,19,37,55,87].includes(num)) return "alkali";
+      if ([4,12,20,38,56,88].includes(num)) return "alkaline-earth";
+      if ([9,17,35,53,85,117].includes(num)) return "halogen";
+      if (num >= 57 && num <= 71)  return "lanthanide";
       if (num >= 89 && num <= 103) return "actinide";
-      // Additional assignments:
-      if (num === 5) return "metalloid";          // Boron
-      if (num === 6 || num === 7 || num === 8) return "nonmetal";
-      if (num === 13) return "post-transition";    // Aluminium
-      if (num === 14) return "metalloid";          // Silicon
-      if (num === 15 || num === 16) return "nonmetal";
-      if (num >= 21 && num <= 30) return "transition";
-      if (num === 31) return "post-transition";    // Gallium
-      if (num === 32 || num === 33) return "metalloid";
-      if (num === 34) return "nonmetal";
-      if (num >= 39 && num <= 48) return "transition";
-      if (num === 49 || num === 50) return "post-transition";
-      if (num === 51 || num === 52) return "metalloid";
-      if (num >= 72 && num <= 80) return "transition";
-      if (num === 81 || num === 82 || num === 83 || num === 84) return "post-transition";
+
+      // Additional smaller logic for specific elements
+      if ([6,7,8].includes(num)) return "nonmetal";
+      if (num === 5)  return "metalloid";       // Boron
+      if (num === 13) return "post-transition"; // Aluminium
+      if (num === 14) return "metalloid";       // Silicon
+      if ([15,16,34].includes(num)) return "nonmetal";
+      if (num >= 21 && num <= 30)  return "transition";
+      if ([31,49,50,81,82,83,84,113,115,116].includes(num)) return "post-transition";
+      if ([32,33,51,52,114].includes(num)) return "metalloid";
+      if (num >= 39 && num <= 48)  return "transition";
+      if (num >= 72 && num <= 80)  return "transition";
       if (num >= 104 && num <= 112) return "transition";
-      if (num === 113) return "post-transition";
-      if (num === 114) return "metalloid";
-      if (num === 115 || num === 116) return "post-transition";
-      if (num === 117) return "halogen";
-      return "transition";
+      return "transition"; // fallback
     }
-    
-    const container = document.getElementById("table-container");
-    const modal = document.getElementById("modal");
-    const modalContent = document.getElementById("element-details");
-    const closeBtn = document.querySelector(".close");
-    const searchInput = document.getElementById("search");
-    const categoryFilter = document.getElementById("categoryFilter");
-    const toggleThemeBtn = document.getElementById("toggleTheme");
-    const tooltip = document.getElementById("tooltip");
-    
-    // Create a tile for an element, applying a color class by its category.
+
+    // DOM ELEMENTS
+    const container       = document.getElementById("table-container");
+    const modal           = document.getElementById("modal");
+    const modalContent    = document.querySelector(".modal-content");
+    const modalDetails    = document.getElementById("element-details");
+    const closeBtn        = document.querySelector(".close");
+    const searchInput     = document.getElementById("search");
+    const categoryFilter  = document.getElementById("categoryFilter");
+    const toggleThemeBtn  = document.getElementById("toggleTheme");
+    const tooltip         = document.getElementById("tooltip");
+
+    // 3) CREATE A TILE FOR EACH ELEMENT
     function createElementTile(item) {
-      const elDiv = document.createElement("div");
-      elDiv.classList.add("element");
-      // Set grid position
-      elDiv.style.gridRow = item.row;
-      elDiv.style.gridColumn = item.col;
-      // Data attribute for search filtering
-      elDiv.setAttribute("data-search", `${item.name.toLowerCase()} ${item.symbol.toLowerCase()} ${item.number}`);
-      
-      // Determine category and add corresponding class
-      const category = getCategory(item);
-      elDiv.classList.add("category-" + category);
-      
-      elDiv.innerHTML = `
+      const tile = document.createElement("div");
+      tile.classList.add("element");
+      // grid positioning
+      tile.style.gridRow    = item.row;
+      tile.style.gridColumn = item.col;
+
+      // category (for color coding)
+      const cat = getCategory(item);
+      tile.classList.add("category-" + cat);
+
+      // data-search attribute for filtering
+      tile.setAttribute("data-search", `${item.name.toLowerCase()} ${item.symbol.toLowerCase()} ${item.number}`);
+
+      tile.innerHTML = `
         <div class="element-number">${item.number}</div>
         <div class="element-symbol">${item.symbol}</div>
         <div class="element-name">${item.name}</div>
       `;
-      
-      // Desktop tooltip (only works on hover)
-      elDiv.addEventListener("mouseenter", (e) => {
+
+      // DESKTOP TOOLTIP (hover)
+      tile.addEventListener("mouseenter", (e) => {
         tooltip.innerText = `${item.name} (${item.symbol}) – Atomic Mass: ${item.atomicMass}`;
         tooltip.style.opacity = 1;
       });
-      elDiv.addEventListener("mousemove", (e) => {
+      tile.addEventListener("mousemove", (e) => {
         tooltip.style.left = e.pageX + 10 + "px";
-        tooltip.style.top = e.pageY + 10 + "px";
+        tooltip.style.top  = e.pageY + 10 + "px";
       });
-      elDiv.addEventListener("mouseleave", () => {
+      tile.addEventListener("mouseleave", () => {
         tooltip.style.opacity = 0;
       });
-      
-      // Open modal with detailed info on click/tap
-      elDiv.addEventListener("click", () => {
-        modalContent.innerHTML = `
+
+      // OPEN MODAL ON CLICK/TAP
+      tile.addEventListener("click", () => {
+        modalDetails.innerHTML = `
           <h2>${item.name} (${item.symbol})</h2>
           <div class="detail-item"><strong>Atomic Number:</strong> ${item.number}</div>
           <div class="detail-item"><strong>Atomic Mass:</strong> ${item.atomicMass}</div>
-          <div class="detail-item"><strong>Category:</strong> ${getCategory(item).replace("-", " ")}</div>
+          <div class="detail-item"><strong>Category:</strong> ${cat.replace("-", " ")}</div>
         `;
         modal.style.display = "block";
       });
-      
-      return elDiv;
+
+      return tile;
     }
-    
-    // Render elements filtered by search query and/or category
+
+    // 4) RENDER THE TABLE, FILTERING BY SEARCH + CATEGORY
     function renderElements() {
       const query = searchInput.value.trim().toLowerCase();
       const selectedCat = categoryFilter.value;
       container.innerHTML = "";
-      elements.forEach(item => {
-        const searchStr = `${item.name.toLowerCase()} ${item.symbol.toLowerCase()} ${item.number}`;
-        const matchesQuery = searchStr.includes(query);
-        const matchesCategory = selectedCat === "" || getCategory(item) === selectedCat;
-        if (matchesQuery && matchesCategory) {
+
+      elements.forEach((item) => {
+        const searchString = `${item.name.toLowerCase()} ${item.symbol.toLowerCase()} ${item.number}`;
+        const matchesQuery = searchString.includes(query);
+        const itemCat = getCategory(item);
+        const matchesCat  = (selectedCat === "" || itemCat === selectedCat);
+
+        if (matchesQuery && matchesCat) {
           container.appendChild(createElementTile(item));
         }
       });
     }
-    
-    // Initial render
+
+    // INITIAL RENDER
     renderElements();
-    
-    // Update render on search or category filter change
+
+    // FILTERING EVENTS
     searchInput.addEventListener("input", renderElements);
     categoryFilter.addEventListener("change", renderElements);
-    
-    // Theme toggle
+
+    // THEME TOGGLE
     toggleThemeBtn.addEventListener("click", () => {
       if (document.body.classList.contains("light")) {
         document.body.classList.remove("light");
@@ -462,31 +513,38 @@
         document.body.classList.add("light");
       }
     });
-    
-    // Modal close events
-    closeBtn.addEventListener("click", () => { modal.style.display = "none"; });
-    window.addEventListener("click", (e) => { if (e.target === modal) modal.style.display = "none"; });
-    
-    // Swipe down-to-close functionality for modal on touch devices
-    let startY;
-    const modalContentContainer = document.querySelector(".modal-content");
-    modalContentContainer.addEventListener("touchstart", (e) => {
-      startY = e.touches[0].clientY;
+
+    // MODAL CLOSE
+    closeBtn.addEventListener("click", () => {
+      modal.style.display = "none";
     });
-    modalContentContainer.addEventListener("touchmove", (e) => {
-      let deltaY = e.touches[0].clientY - startY;
-      if (deltaY > 0) {
-        modalContentContainer.style.transform = `translateY(${deltaY}px)`;
-      }
-    });
-    modalContentContainer.addEventListener("touchend", (e) => {
-      let deltaY = e.changedTouches[0].clientY - startY;
-      if (deltaY > 100) { // if swiped down far enough, close modal
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) {
         modal.style.display = "none";
       }
-      modalContentContainer.style.transform = "";
+    });
+
+    // SWIPE-DOWN TO CLOSE (for mobile)
+    let startY;
+    modalContent.addEventListener("touchstart", (e) => {
+      startY = e.touches[0].clientY;
+    });
+    modalContent.addEventListener("touchmove", (e) => {
+      let deltaY = e.touches[0].clientY - startY;
+      if (deltaY > 0) {
+        modalContent.style.transform = `translateY(${deltaY}px)`;
+      }
+    });
+    modalContent.addEventListener("touchend", (e) => {
+      let deltaY = e.changedTouches[0].clientY - startY;
+      // if swiped down more than 100px, close
+      if (deltaY > 100) {
+        modal.style.display = "none";
+      }
+      modalContent.style.transform = "";
     });
   </script>
 </body>
 </html>
+
 
