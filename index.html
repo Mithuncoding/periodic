@@ -2,17 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- Ensure proper scaling on mobile devices -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Advanced Colorful Periodic Table Explorer</title>
+  <!-- Mobile web app meta tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#3a7bd5" />
+  <title>Advanced Periodic Table Explorer</title>
   <style>
-    /* Reset and Global Styles */
+    /* Reset & Global Styles */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; }
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       transition: background 0.3s, color 0.3s;
+      -webkit-tap-highlight-color: transparent;
     }
-    /* Light & Dark Themes */
+    /* Themes */
     body.light { background: #f0f0f0; color: #333; }
     body.dark { background: #121212; color: #ddd; }
     
@@ -30,16 +36,19 @@
       margin-top: 10px;
       display: flex;
       justify-content: center;
+      align-items: center;
       gap: 10px;
       flex-wrap: wrap;
     }
-    header input[type="text"] {
+    header input[type="text"],
+    header select {
       padding: 10px;
-      width: 300px;
       border: none;
       border-radius: 4px;
       font-size: 1em;
     }
+    header input[type="text"] { width: 300px; }
+    header select { width: 220px; }
     header button {
       padding: 10px 15px;
       border: none;
@@ -92,7 +101,7 @@
     .element.category-lanthanide { background-color: #ead1dc; }          /* Light pink */
     .element.category-actinide { background-color: #d9d2e9; }            /* Light purple */
     
-    /* Tooltip */
+    /* Tooltip (desktop only) */
     #tooltip {
       position: absolute;
       background: rgba(0, 0, 0, 0.75);
@@ -132,6 +141,8 @@
       max-width: 500px;
       position: relative;
       animation: slideIn 0.3s;
+      transition: transform 0.2s ease-out;
+      touch-action: pan-y;
     }
     @keyframes slideIn {
       from { transform: translateY(-20px); opacity: 0; }
@@ -149,13 +160,35 @@
     }
     .close:hover { color: #000; }
     .detail-item { margin: 10px 0; font-size: 1em; }
+    
+    /* Responsive adjustments for mobile devices */
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.5em; }
+      header input[type="text"] { width: 200px; }
+      header select { width: 180px; }
+      #table-container { gap: 3px; }
+      .element { padding: 3px; font-size: 0.9em; }
+    }
   </style>
 </head>
 <body class="light">
   <header>
-    <h1>Advanced Colorful Periodic Table Explorer</h1>
+    <h1>Advanced Periodic Table Explorer</h1>
     <div class="controls">
-      <input type="text" id="search" placeholder="Search element (name, symbol, number)" />
+      <input type="text" id="search" placeholder="Search by name, symbol, number" />
+      <select id="categoryFilter" aria-label="Filter elements by category">
+        <option value="">All Categories</option>
+        <option value="alkali">Alkali Metals</option>
+        <option value="alkaline-earth">Alkaline Earth Metals</option>
+        <option value="transition">Transition Metals</option>
+        <option value="post-transition">Post-Transition Metals</option>
+        <option value="metalloid">Metalloids</option>
+        <option value="nonmetal">Nonmetals</option>
+        <option value="halogen">Halogens</option>
+        <option value="noble-gas">Noble Gases</option>
+        <option value="lanthanide">Lanthanides</option>
+        <option value="actinide">Actinides</option>
+      </select>
       <button id="toggleTheme">Toggle Dark/Light</button>
     </div>
   </header>
@@ -163,7 +196,7 @@
     <div id="table-container"></div>
   </main>
   
-  <!-- Tooltip -->
+  <!-- Tooltip (for desktop hover) -->
   <div id="tooltip"></div>
   
   <!-- Modal for Element Details -->
@@ -175,7 +208,7 @@
   </div>
   
   <script>
-    // Data for elements (with grid positions)
+    // Element data with grid positions
     const elements = [
       // Period 1
       { number: 1,  symbol: "H",  name: "Hydrogen",      atomicMass: "1.008",    row: 1, col: 1 },
@@ -308,48 +341,37 @@
       { number: 103, symbol: "Lr", name: "Lawrencium",   atomicMass: "262",     row: 9, col: 17 }
     ];
     
-    // Determine the element category based on atomic number
+    // Determine element category based on atomic number
     function getCategory(item) {
       const num = item.number;
       if (num === 1) return "nonmetal";
-      if ([2, 10, 18, 36, 54, 86].includes(num)) return "noble-gas";
-      if (num === 118) return "noble-gas";
+      if ([2, 10, 18, 36, 54, 86, 118].includes(num)) return "noble-gas";
       if ([3, 11, 19, 37, 55, 87].includes(num)) return "alkali";
       if ([4, 12, 20, 38, 56, 88].includes(num)) return "alkaline-earth";
       if ([9, 17, 35, 53, 85].includes(num)) return "halogen";
       if (num >= 57 && num <= 71) return "lanthanide";
       if (num >= 89 && num <= 103) return "actinide";
-      // For the remaining lower-numbered elements:
+      // Additional assignments:
       if (num === 5) return "metalloid";          // Boron
-      if (num === 6) return "nonmetal";            // Carbon
-      if (num === 7) return "nonmetal";            // Nitrogen
-      if (num === 8) return "nonmetal";            // Oxygen
+      if (num === 6 || num === 7 || num === 8) return "nonmetal";
       if (num === 13) return "post-transition";    // Aluminium
       if (num === 14) return "metalloid";          // Silicon
-      if (num === 15) return "nonmetal";           // Phosphorus
-      if (num === 16) return "nonmetal";           // Sulfur
+      if (num === 15 || num === 16) return "nonmetal";
       if (num >= 21 && num <= 30) return "transition";
       if (num === 31) return "post-transition";    // Gallium
-      if (num === 32) return "metalloid";          // Germanium
-      if (num === 33) return "metalloid";          // Arsenic
-      if (num === 34) return "nonmetal";           // Selenium
+      if (num === 32 || num === 33) return "metalloid";
+      if (num === 34) return "nonmetal";
       if (num >= 39 && num <= 48) return "transition";
-      if (num === 49) return "post-transition";    // Indium
-      if (num === 50) return "post-transition";    // Tin
-      if (num === 51) return "metalloid";          // Antimony
-      if (num === 52) return "metalloid";          // Tellurium
+      if (num === 49 || num === 50) return "post-transition";
+      if (num === 51 || num === 52) return "metalloid";
       if (num >= 72 && num <= 80) return "transition";
-      if (num === 81) return "post-transition";    // Thallium
-      if (num === 82) return "post-transition";    // Lead
-      if (num === 83) return "post-transition";    // Bismuth
-      if (num === 84) return "post-transition";    // Polonium
+      if (num === 81 || num === 82 || num === 83 || num === 84) return "post-transition";
       if (num >= 104 && num <= 112) return "transition";
-      if (num === 113) return "post-transition";   // Nihonium
-      if (num === 114) return "metalloid";          // Flerovium
-      if (num === 115) return "post-transition";   // Moscovium
-      if (num === 116) return "post-transition";   // Livermorium
-      if (num === 117) return "halogen";            // Tennessine
-      return "transition"; // default fallback
+      if (num === 113) return "post-transition";
+      if (num === 114) return "metalloid";
+      if (num === 115 || num === 116) return "post-transition";
+      if (num === 117) return "halogen";
+      return "transition";
     }
     
     const container = document.getElementById("table-container");
@@ -357,20 +379,21 @@
     const modalContent = document.getElementById("element-details");
     const closeBtn = document.querySelector(".close");
     const searchInput = document.getElementById("search");
+    const categoryFilter = document.getElementById("categoryFilter");
     const toggleThemeBtn = document.getElementById("toggleTheme");
     const tooltip = document.getElementById("tooltip");
     
-    // Create a tile for an element and add a color class based on category.
+    // Create a tile for an element, applying a color class by its category.
     function createElementTile(item) {
       const elDiv = document.createElement("div");
       elDiv.classList.add("element");
-      // Set grid position:
+      // Set grid position
       elDiv.style.gridRow = item.row;
       elDiv.style.gridColumn = item.col;
-      // Set a data attribute for search filtering.
+      // Data attribute for search filtering
       elDiv.setAttribute("data-search", `${item.name.toLowerCase()} ${item.symbol.toLowerCase()} ${item.number}`);
       
-      // Determine category and add corresponding class.
+      // Determine category and add corresponding class
       const category = getCategory(item);
       elDiv.classList.add("category-" + category);
       
@@ -380,7 +403,7 @@
         <div class="element-name">${item.name}</div>
       `;
       
-      // Tooltip events
+      // Desktop tooltip (only works on hover)
       elDiv.addEventListener("mouseenter", (e) => {
         tooltip.innerText = `${item.name} (${item.symbol}) – Atomic Mass: ${item.atomicMass}`;
         tooltip.style.opacity = 1;
@@ -393,7 +416,7 @@
         tooltip.style.opacity = 0;
       });
       
-      // Open modal with detailed info on click
+      // Open modal with detailed info on click/tap
       elDiv.addEventListener("click", () => {
         modalContent.innerHTML = `
           <h2>${item.name} (${item.symbol})</h2>
@@ -407,15 +430,17 @@
       return elDiv;
     }
     
-    // Render element tiles (filtering by search term if provided)
-    function renderElements(filter = "") {
+    // Render elements filtered by search query and/or category
+    function renderElements() {
+      const query = searchInput.value.trim().toLowerCase();
+      const selectedCat = categoryFilter.value;
       container.innerHTML = "";
       elements.forEach(item => {
-        if (item.name.toLowerCase().includes(filter) ||
-            item.symbol.toLowerCase().includes(filter) ||
-            item.number.toString().includes(filter)) {
-          const tile = createElementTile(item);
-          container.appendChild(tile);
+        const searchStr = `${item.name.toLowerCase()} ${item.symbol.toLowerCase()} ${item.number}`;
+        const matchesQuery = searchStr.includes(query);
+        const matchesCategory = selectedCat === "" || getCategory(item) === selectedCat;
+        if (matchesQuery && matchesCategory) {
+          container.appendChild(createElementTile(item));
         }
       });
     }
@@ -423,15 +448,13 @@
     // Initial render
     renderElements();
     
-    // Search functionality
-    searchInput.addEventListener("input", () => {
-      const query = searchInput.value.trim().toLowerCase();
-      renderElements(query);
-    });
+    // Update render on search or category filter change
+    searchInput.addEventListener("input", renderElements);
+    categoryFilter.addEventListener("change", renderElements);
     
-    // Theme toggle functionality
+    // Theme toggle
     toggleThemeBtn.addEventListener("click", () => {
-      if(document.body.classList.contains("light")){
+      if (document.body.classList.contains("light")) {
         document.body.classList.remove("light");
         document.body.classList.add("dark");
       } else {
@@ -441,12 +464,29 @@
     });
     
     // Modal close events
-    closeBtn.addEventListener("click", () => {
-      modal.style.display = "none";
+    closeBtn.addEventListener("click", () => { modal.style.display = "none"; });
+    window.addEventListener("click", (e) => { if (e.target === modal) modal.style.display = "none"; });
+    
+    // Swipe down-to-close functionality for modal on touch devices
+    let startY;
+    const modalContentContainer = document.querySelector(".modal-content");
+    modalContentContainer.addEventListener("touchstart", (e) => {
+      startY = e.touches[0].clientY;
     });
-    window.addEventListener("click", (e) => {
-      if (e.target === modal) modal.style.display = "none";
+    modalContentContainer.addEventListener("touchmove", (e) => {
+      let deltaY = e.touches[0].clientY - startY;
+      if (deltaY > 0) {
+        modalContentContainer.style.transform = `translateY(${deltaY}px)`;
+      }
+    });
+    modalContentContainer.addEventListener("touchend", (e) => {
+      let deltaY = e.changedTouches[0].clientY - startY;
+      if (deltaY > 100) { // if swiped down far enough, close modal
+        modal.style.display = "none";
+      }
+      modalContentContainer.style.transform = "";
     });
   </script>
 </body>
 </html>
+
